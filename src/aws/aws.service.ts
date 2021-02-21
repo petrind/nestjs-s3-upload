@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import {
-  S3_BUCKET_NAME,
   AWS_API_VERSION,
   AWS_REGION,
   FileUploadStatus,
+  S3_BUCKET_NAME,
 } from '../constants';
 import { AwsS3UploadParams } from '../dto/awsS3UploadParams.dto';
 

@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { PATH_AWS, PATH_FILE_UPLOAD } from '../constants';
 import { FileNamePayloadDto } from '../dto/file.dto';
-import { PATH_FILE_UPLOAD, PATH_AWS } from '../constants';
 import { AwsService } from './aws.service';
 
 @Controller(PATH_AWS)
