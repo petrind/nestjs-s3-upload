@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  HttpException,
+  HttpStatus,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -8,23 +10,15 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { FileNamePayloadDto } from '../dto/file.dto';
-import * as AWS from 'aws-sdk';
 import {
-  S3_BUCKET_NAME,
-  AWS_API_VERSION,
-  AWS_REGION,
   PATH_FILE_UPLOAD,
   PATH_AWS,
-  FileUploadStatus,
-} from 'src/constants';
-import { AwsS3UploadParams } from 'src/dto/awsS3UploadParams.dto';
-import { resolve } from 'path';
+} from '../constants';
+import { AwsService } from './aws.service';
 
 @Controller(PATH_AWS)
 export class AwsController {
-  constructor() {
-    AWS.config.update({ region: AWS_REGION });
-  }
+  constructor(private readonly awsService: AwsService) {}
 
   @UseInterceptors(FileInterceptor(FileNamePayloadDto.FILE_PARAM))
   @Post(PATH_FILE_UPLOAD)
@@ -32,39 +26,10 @@ export class AwsController {
     @Body() body: FileNamePayloadDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const s3: AWS.S3 = new AWS.S3({ apiVersion: AWS_API_VERSION });
-    const uploadParams: AwsS3UploadParams = {
-      Bucket: S3_BUCKET_NAME,
-      Key: body.name,
-      Body: file.buffer,
-    };
 
-    let status: string;
-
-    return Promise.resolve(
-      s3.upload(uploadParams, (err, data) => {
-        status = FileUploadStatus.WIP;
-        if (err) {
-          // TODO use logger
-          console.error(err)
-          status = FileUploadStatus.ERROR;
-        }
-        if (data) {
-          status = FileUploadStatus.SUCCESS;
-        }
-      })
-      .promise()
-    )
-    .catch((error) => {
-      // TODO use logger
-      console.error(error);
-      status = FileUploadStatus.ERROR;
-    })
-    .finally(() => {
-      return {
-        filename: body.name,
-        status,
-      }
-    });
+    if (!file) {
+      throw new HttpException('No File', HttpStatus.BAD_REQUEST);
+    }
+    return this.awsService.uploadS3(body.name, file);
   }
 }
