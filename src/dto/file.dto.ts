@@ -1,5 +1,5 @@
 export class FileNamePayloadDto {
-    name: string;
+  name: string;
 
-    static FILE_PARAM = 'file';
+  static FILE_PARAM = 'file';
 }

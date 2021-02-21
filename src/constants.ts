@@ -9,7 +9,7 @@ export const PATH_FILE_UPLOAD = 'file-upload';
 
 // STATUS
 export enum FileUploadStatus {
-    WIP = 'WIP',
-    ERROR = 'ERROR',
-    SUCCESS = 'SUCCESS',
+  WIP = 'WIP',
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS',
 }
