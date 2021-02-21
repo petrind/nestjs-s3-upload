@@ -2,9 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { FileUploadStatus } from './../src/constants';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+    app = moduleRef.createNestApplication();
+    await app.init();
+  });
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,10 +24,19 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('should fail upload to S3', async () => {
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .post('/aws/file-upload')
+      .attach('file', './package.json')
+      .field('name', 'test')
+      .expect(201)
+      .expect({
+        filename: 'test',
+        status: FileUploadStatus.ERROR_IN_PROCESS,
+      });
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });

@@ -10,10 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { FileNamePayloadDto } from '../dto/file.dto';
-import {
-  PATH_FILE_UPLOAD,
-  PATH_AWS,
-} from '../constants';
+import { PATH_FILE_UPLOAD, PATH_AWS } from '../constants';
 import { AwsService } from './aws.service';
 
 @Controller(PATH_AWS)
@@ -26,7 +23,6 @@ export class AwsController {
     @Body() body: FileNamePayloadDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-
     if (!file) {
       throw new HttpException('No File', HttpStatus.BAD_REQUEST);
     }

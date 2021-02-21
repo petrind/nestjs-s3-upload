@@ -20,7 +20,7 @@ describe('AwsController', () => {
     it('failed should throw error', () => {
       const filenamePayload: FileNamePayloadDto = {
         name: 'test',
-      }
+      };
       try {
         awsController.uploadFile(filenamePayload, null);
       } catch (error) {
