@@ -1,11 +1,13 @@
 ## Description
 
-Upload to S3 using aws-sdk and based on NestJs
+Upload to S3 using aws-sdk and based on NestJs.
+
 Reference:
 - [aws-sdk](https://www.npmjs.com/package/aws-sdk)
 - [upload docs](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/s3-example-creating-buckets.html)
 - [NestJS file upload example](https://docs.nestjs.com/techniques/file-upload)
-- 
+
+
 ## Installation
 
 ```bash
@@ -55,7 +57,7 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## Stay in touch
 
-- Author - [Petrus F. Subekti]()
+- Author - [Petrus F. Subekti](https://github.com/petrind)
 - Based on Nest [https://nestjs.com](https://nestjs.com/)
 
 ## License
