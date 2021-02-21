@@ -18,6 +18,7 @@ import {
   FileUploadStatus,
 } from 'src/constants';
 import { AwsS3UploadParams } from 'src/dto/awsS3UploadParams.dto';
+import { resolve } from 'path';
 
 @Controller(PATH_AWS)
 export class AwsController {
@@ -38,20 +39,32 @@ export class AwsController {
       Body: file.buffer,
     };
 
-    let status: string = FileUploadStatus.WIP;
+    let status: string;
 
-    s3.upload(uploadParams, (err, data) => {
-      if (err) {
-        status = FileUploadStatus.ERROR;
-      }
-      if (data) {
-        status = FileUploadStatus.SUCCESS;
+    return Promise.resolve(
+      s3.upload(uploadParams, (err, data) => {
+        status = FileUploadStatus.WIP;
+        if (err) {
+          // TODO use logger
+          console.error(err)
+          status = FileUploadStatus.ERROR;
+        }
+        if (data) {
+          status = FileUploadStatus.SUCCESS;
+        }
+      })
+      .promise()
+    )
+    .catch((error) => {
+      // TODO use logger
+      console.error(error);
+      status = FileUploadStatus.ERROR;
+    })
+    .finally(() => {
+      return {
+        filename: body.name,
+        status,
       }
     });
-
-    return {
-      filename: body.name,
-      status,
-    };
   }
 }
