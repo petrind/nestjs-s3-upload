@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const nodeExternals = require('webpack-node-externals');
 const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 const { WebpackPnpExternals } = require('webpack-pnp-externals');
 
@@ -15,7 +14,7 @@ module.exports = function(options) {
       ...options.plugins,
       new webpack.HotModuleReplacementPlugin(),
       new webpack.WatchIgnorePlugin({
-        paths: [/\.js$/, /\.d\.ts$/]
+        paths: [/\.js$/, /\.d\.ts$/, 'test', 'dist', 'node_modules']
       }),
       new RunScriptWebpackPlugin({ name: options.output.filename }),
     ],
