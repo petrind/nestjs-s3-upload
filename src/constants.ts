@@ -2,6 +2,7 @@
 export const S3_BUCKET_NAME = 'bucket_name';
 export const AWS_REGION = 'us-west-2';
 export const AWS_API_VERSION = '2006-03-01';
+export const S3_ENDPOINT = 'https://s3.test.com'
 
 // PATH
 export const PATH_AWS = 'aws';
