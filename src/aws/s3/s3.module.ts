@@ -1,6 +1,6 @@
 import { Module, Provider } from '@nestjs/common';
-import { S3Service } from './s3.service';
 import { S3_ENDPOINT } from 'src/constants';
+import { S3Service } from './s3.service';
 import { getS3ServiceToken } from './s3.utils';
 
 function s3Factory(s3: S3Service, endpoint: string) {

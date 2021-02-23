@@ -20,7 +20,7 @@ export class S3Service {
     this.s3 = new S3({
       apiVersion: AWS_API_VERSION,
       endpoint: new Endpoint(endpoint),
-      region: AWS_REGION 
+      region: AWS_REGION
     });
   }
 
