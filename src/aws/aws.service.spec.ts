@@ -1,13 +1,22 @@
+jest.mock('aws-sdk')
 import { Test, TestingModule } from '@nestjs/testing';
-import * as AWS from 'aws-sdk';
+import { S3 } from 'aws-sdk';
 import { readFileSync } from 'fs';
-import { FileUploadStatus } from '../constants';
+import { FileUploadStatus, S3_ENDPOINT } from '../constants';
 import { AwsService } from './aws.service';
+import { S3Service } from './s3/s3.service';
+import { getS3ServiceToken } from './s3/s3.utils';
 
 describe('AwsService', () => {
   let mockS3: any;
-
   let awsService: AwsService;
+
+  const mockS3Service: S3Service = {
+    executeDownloadS3: jest.fn(),
+    executeUploadS3: jest.fn(),
+    setS3: jest.fn(),
+    s3Obj: new S3(),
+  }
 
   beforeEach(async () => {
     mockS3 = {
@@ -17,7 +26,13 @@ describe('AwsService', () => {
     }
 
     const app: TestingModule = await Test.createTestingModule({
-      providers: [AwsService],
+      providers: [
+        AwsService,
+        {
+          provide: getS3ServiceToken(S3_ENDPOINT),
+          useValue: mockS3Service
+        }
+      ],
     }).compile();
     awsService = app.get<AwsService>(AwsService);
   });
@@ -25,7 +40,7 @@ describe('AwsService', () => {
   describe('uploadFile', () => {
     it('should success by mocking executeUploadS3', async () => {
       jest
-        .spyOn(awsService, 'executeUploadS3')
+        .spyOn(mockS3Service, 'executeUploadS3')
         .mockImplementation(() => Promise.resolve(FileUploadStatus.SUCCESS));
       const fileToBeUploaded = readFileSync('./package.json');
 
@@ -39,7 +54,7 @@ describe('AwsService', () => {
 
     it('should failed by mocking executeUploadS3', async () => {
         jest
-          .spyOn(awsService, 'executeUploadS3')
+          .spyOn(mockS3Service, 'executeUploadS3')
           .mockImplementation(() => { throw new Error() });
 
         expect(await awsService.uploadS3('test', 'file')).toEqual(
@@ -51,34 +66,10 @@ describe('AwsService', () => {
       });
   });
 
-  describe('executeUploadFile', () => {
-    it('should success by mocking S3', async () => {
-      mockS3.promise = jest.fn().mockReturnThis();
-      mockS3.then = jest.fn(() => Promise.resolve(FileUploadStatus.SUCCESS));
-      jest
-        .spyOn(awsService, 's3', 'get')
-        .mockImplementation(() => mockS3);
-      expect(await awsService.executeUploadS3('test', 'file')).toEqual(
-        FileUploadStatus.SUCCESS
-      )
-    });
-
-    it('should failed  by mocking S3', async () => {
-      mockS3.promise = jest.fn().mockReturnThis();
-      mockS3.then = jest.fn(() => Promise.resolve(FileUploadStatus.ERROR_AWS));
-      jest
-        .spyOn(awsService, 's3', 'get')
-        .mockImplementation(() => mockS3);
-      expect(await awsService.executeUploadS3('test', 'file')).toEqual(
-        FileUploadStatus.ERROR_AWS
-      )
-      });
-  });
-
   describe('downloadFile', () => {
     it('should failed by mocking executeDownloadS3', async () => {
       jest
-        .spyOn(awsService, 'executeDownloadS3')
+        .spyOn(mockS3Service, 'executeDownloadS3')
         .mockImplementation(() => Promise.resolve(false));
 
       expect(await awsService.downloadS3('test')).toEqual(
@@ -88,32 +79,8 @@ describe('AwsService', () => {
 
     it('should failed by mocking executeDownloadS3', async () => {
       jest
-        .spyOn(awsService, 'executeDownloadS3')
+        .spyOn(mockS3Service, 'executeDownloadS3')
         .mockImplementation(() => Promise.resolve(false));
-
-      expect(await awsService.downloadS3('test')).toEqual(
-        false
-      )
-    });
-
-    it('should success by mocking S3', async () => {
-      mockS3.promise = jest.fn().mockReturnThis();
-      mockS3.then = jest.fn(() => Promise.resolve(true));
-      jest
-        .spyOn(awsService, 's3', 'get')
-        .mockImplementation(() => mockS3);
-
-      expect(await awsService.downloadS3('test')).toEqual(
-        true
-      )
-    });
-
-    it('should failed by mocking S3', async () => {
-      mockS3.promise = jest.fn().mockReturnThis();
-      mockS3.then = jest.fn(() => Promise.resolve(false));
-      jest
-        .spyOn(awsService, 's3', 'get')
-        .mockImplementation(() => mockS3);
 
       expect(await awsService.downloadS3('test')).toEqual(
         false
