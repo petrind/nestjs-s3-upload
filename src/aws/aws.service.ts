@@ -1,27 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { Endpoint, S3 } from 'aws-sdk';
+import { Inject, Injectable } from '@nestjs/common';
+import { S3 } from 'aws-sdk';
 import {
-  AWS_API_VERSION,
-  AWS_REGION,
   FileUploadStatus,
   S3_BUCKET_NAME,
-  S3_ENDPOINT
 } from '../constants';
 import { AwsS3Params, AwsS3UploadParams } from '../dto/awsS3UploadParams.dto';
 
 @Injectable()
 export class AwsService {
-  s3Obj: S3;
 
-  get s3() {
-    return this.s3Obj
-  }
-  constructor() {
-    this.s3Obj = new S3({
-      apiVersion: AWS_API_VERSION,
-      endpoint: new Endpoint(S3_ENDPOINT),
-      region: AWS_REGION
-    });
+  constructor(@Inject('S3') private s3: S3) {
   }
 
   async uploadS3(name: string, file: any) {
@@ -62,6 +50,7 @@ export class AwsService {
         // TODO use logger
       }
       if (data) {
+        // TODO save address
         status = FileUploadStatus.SUCCESS;
       }
     }).promise()
@@ -81,6 +70,7 @@ export class AwsService {
         // TODO use logger
       }
       if (data) {
+        // TODO save address
         status = true;
       }
     })
